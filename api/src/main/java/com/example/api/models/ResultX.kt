@@ -7,79 +7,79 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class ResultX(
     @Json(name = "address_components")
-    val addressComponents: List<AddressComponent>,
+    val addressComponents: List<AddressComponent>?,
     @Json(name = "adr_address")
-    val adrAddress: String,
+    val adrAddress: String?,
     @Json(name = "business_status")
-    val businessStatus: String,
+    val businessStatus: String?,
     @Json(name = "current_opening_hours")
-    val currentOpeningHours: CurrentOpeningHours,
+    val currentOpeningHours: CurrentOpeningHours?,
     @Json(name = "delivery")
-    val delivery: Boolean,
+    val delivery: Boolean?,
     @Json(name = "dine_in")
-    val dineIn: Boolean,
+    val dineIn: Boolean?,
     @Json(name = "editorial_summary")
-    val editorialSummary: EditorialSummary,
+    val editorialSummary: EditorialSummary?,
     @Json(name = "formatted_address")
-    val formattedAddress: String,
+    val formattedAddress: String?,
     @Json(name = "formatted_phone_number")
-    val formattedPhoneNumber: String,
+    val formattedPhoneNumber: String?,
     @Json(name = "geometry")
-    val geometry: GeometryX,
+    val geometry: GeometryX?,
     @Json(name = "icon")
-    val icon: String,
+    val icon: String?,
     @Json(name = "icon_background_color")
-    val iconBackgroundColor: String,
+    val iconBackgroundColor: String?,
     @Json(name = "icon_mask_base_uri")
-    val iconMaskBaseUri: String,
+    val iconMaskBaseUri: String?,
     @Json(name = "international_phone_number")
-    val internationalPhoneNumber: String,
+    val internationalPhoneNumber: String?,
     @Json(name = "name")
-    val name: String,
+    val name: String?,
     @Json(name = "opening_hours")
-    val openingHours: OpeningHoursX,
+    val openingHours: OpeningHoursX?,
     @Json(name = "photos")
-    val photos: List<PhotoX>,
+    val photos: List<PhotoX>?,
     @Json(name = "place_id")
-    val placeId: String,
+    val placeId: String?,
     @Json(name = "plus_code")
-    val plusCode: PlusCodeX,
+    val plusCode: PlusCodeX?,
     @Json(name = "price_level")
-    val priceLevel: Int,
+    val priceLevel: Int?,
     @Json(name = "rating")
-    val rating: Double,
+    val rating: Double?,
     @Json(name = "reference")
-    val reference: String,
+    val reference: String?,
     @Json(name = "reservable")
-    val reservable: Boolean,
+    val reservable: Boolean?,
     @Json(name = "reviews")
-    val reviews: List<Review>,
+    val reviews: List<Review>?,
     @Json(name = "serves_beer")
-    val servesBeer: Boolean,
+    val servesBeer: Boolean?,
     @Json(name = "serves_brunch")
-    val servesBrunch: Boolean,
+    val servesBrunch: Boolean?,
     @Json(name = "serves_dinner")
-    val servesDinner: Boolean,
+    val servesDinner: Boolean?,
     @Json(name = "serves_lunch")
-    val servesLunch: Boolean,
+    val servesLunch: Boolean?,
     @Json(name = "serves_vegetarian_food")
-    val servesVegetarianFood: Boolean,
+    val servesVegetarianFood: Boolean?,
     @Json(name = "serves_wine")
-    val servesWine: Boolean,
+    val servesWine: Boolean?,
     @Json(name = "takeout")
-    val takeout: Boolean,
+    val takeout: Boolean?,
     @Json(name = "types")
-    val types: List<String>,
+    val types: List<String>?,
     @Json(name = "url")
-    val url: String,
+    val url: String?,
     @Json(name = "user_ratings_total")
-    val userRatingsTotal: Int,
+    val userRatingsTotal: Int?,
     @Json(name = "utc_offset")
-    val utcOffset: Int,
+    val utcOffset: Int?,
     @Json(name = "vicinity")
-    val vicinity: String,
+    val vicinity: String?,
     @Json(name = "website")
-    val website: String,
+    val website: String?,
     @Json(name = "wheelchair_accessible_entrance")
-    val wheelchairAccessibleEntrance: Boolean
+    val wheelchairAccessibleEntrance: Boolean?
 )

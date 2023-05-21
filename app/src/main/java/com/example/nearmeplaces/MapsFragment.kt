@@ -13,7 +13,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.nearmeplaces.databinding.FragmentMapsBinding
+import com.example.nearmeplaces.repository.PlacesRepository
+import com.example.nearmeplaces.utils.Resource
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -28,6 +32,7 @@ import com.google.android.gms.maps.model.PointOfInterest
 class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
 
   private lateinit var binding: FragmentMapsBinding
+  private lateinit var viewModel: MapsViewModel
   private lateinit var mMap: GoogleMap
   private lateinit var lastLocation: Location
   private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -52,11 +57,30 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    val placesRepository = PlacesRepository()
+    viewModel =
+      ViewModelProvider(this, MapsViewModelFactory(placesRepository))
+        .get(MapsViewModel::class.java)
+
     val mapFragment =
       childFragmentManager.findFragmentById(R.id.google_map) as SupportMapFragment
     mapFragment.getMapAsync(this)
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+    viewModel.placeDetails.observe(viewLifecycleOwner) { response ->
+      when(response){
+        is Resource.Success -> {
+          response.data?.let {
+            Log.d("placeDetails", response.data.result.name.toString())
+          }
+        }
+        is Resource.Loading -> {
+
+        }
+        else -> {}
+      }
+    }
 
     binding.bottomNavigation.setOnItemSelectedListener { item->
       when(item.itemId) {
@@ -128,6 +152,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
   }
 
   override fun onPoiClick(poi: PointOfInterest) {
+    viewModel.getPlaceDetails(poi.placeId)
     Toast.makeText(requireContext(), """Clicked: ${poi.name}
             Place ID:${poi.placeId}
             Latitude:${poi.latLng.latitude} Longitude:${poi.latLng.longitude}""",
