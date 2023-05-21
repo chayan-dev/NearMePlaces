@@ -2,10 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
   <item
-    android:id="@+id/invib"
-    android:enabled="true"
+    android:id="@+id/extra"
     android:visible="false"
-    android:title="invisible"/>
+    android:title=""/>
 
   <item
     android:id="@+id/cafe"

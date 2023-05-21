@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.nearmeplaces.databinding.FragmentMapsBinding
 import com.example.nearmeplaces.repository.PlacesRepository
+import com.example.nearmeplaces.utils.BitmapHelper
 import com.example.nearmeplaces.utils.Resource
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,9 +26,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnPoiClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PointOfInterest
+import com.google.android.gms.maps.model.*
 
 class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
 
@@ -35,6 +34,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
   private lateinit var viewModel: MapsViewModel
   private lateinit var mMap: GoogleMap
   private lateinit var lastLocation: Location
+  private var filterMarker: Marker? = null
   private lateinit var fusedLocationClient: FusedLocationProviderClient
   private val requestPermissionLauncher =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -44,6 +44,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
         //TODO: show toast
       }
     }
+  private val cafeIcon: BitmapDescriptor by lazy {
+    val color = ContextCompat.getColor(requireContext(), R.color.purple_500)
+    BitmapHelper.vectorToBitmap(requireContext(), R.drawable.ic_restaurant, color)
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -82,10 +86,37 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
       }
     }
 
+    viewModel.nearbyPlacesListDetails.observe(viewLifecycleOwner) { response ->
+      when(response){
+        is Resource.Success -> {
+          response.data?.let {
+            it.results.forEach{
+              Log.d("nearbyPLace:", it.name)
+              mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_invisible))
+              filterMarker = mMap.addMarker(
+                MarkerOptions()
+                  .title(it.name)
+                  .position(LatLng(it.geometry.location.lat,it.geometry.location.lng))
+                  .icon(cafeIcon)
+              )
+            }
+          }
+        }
+        is Resource.Loading -> {
+
+        }
+        else -> {}
+      }
+    }
+
     binding.bottomNavigation.setOnItemSelectedListener { item->
       when(item.itemId) {
         R.id.cafe -> {
-          Log.d("MapsFrgment","cafe clicked")
+          Log.d("MapsFragment","cafe clicked")
+          viewModel.getNearbyPlacesByType(
+            lastLocation.latitude.toString()+","+lastLocation.longitude.toString(),
+            "restaurant"
+            )
           true
           // Respond to navigation item 1 reselection
         }
@@ -108,11 +139,37 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
         else -> false
       }
     }
+
+    binding.bottomNavigation.setOnItemReselectedListener { item ->
+      when(item.itemId) {
+        R.id.cafe -> {
+//          filterMarker?.remove()
+          mMap.clear()
+          placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+          mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_visible))
+          binding.bottomNavigation.menu.findItem(R.id.extra).isChecked = true
+          Log.d("MapsFragment","cafe reclicked")
+          // Respond to navigation item 1 reselection
+        }
+        R.id.atm -> {
+
+          // Respond to navigation item 2 reselection
+        }
+        R.id.hospital -> {
+          // Respond to navigation item 2 reselection
+        }
+        R.id.school -> {
+          // Respond to navigation item 2 reselection
+        }
+        else -> { }
+      }
+
+    }
   }
 
   override fun onMapReady(googleMap: GoogleMap) {
     mMap = googleMap
-    mMap.uiSettings.isZoomControlsEnabled = true
+//    mMap.uiSettings.isZoomControlsEnabled = true
     checkLocationPermission()
     mMap.setOnPoiClickListener(this)
   }
