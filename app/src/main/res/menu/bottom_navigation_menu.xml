@@ -10,7 +10,7 @@
     android:id="@+id/cafe"
     android:enabled="true"
     android:icon="@drawable/ic_restaurant"
-    android:title="cafe"/>
+    android:title="restaurant"/>
 
 <!--  <item-->
 <!--    android:id="@+id/park"-->

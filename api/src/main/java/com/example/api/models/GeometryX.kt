@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class GeometryX(
     @Json(name = "location")
-    val location: LocationX,
+    val location: Location,
     @Json(name = "viewport")
     val viewport: ViewportX
 )

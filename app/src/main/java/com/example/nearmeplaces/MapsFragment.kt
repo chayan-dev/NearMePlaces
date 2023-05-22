@@ -10,11 +10,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.example.nearmeplaces.databinding.FragmentMapsBinding
-import com.example.nearmeplaces.utils.BitmapHelper
 import com.example.nearmeplaces.utils.Resource
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -26,7 +26,11 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
-class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener, OnMarkerClickListener {
+class MapsFragment : Fragment(),
+  OnMapReadyCallback,
+  OnPoiClickListener,
+  OnMarkerClickListener
+{
 
   private lateinit var binding: FragmentMapsBinding
   private val viewModel: MapsViewModel by activityViewModels()
@@ -39,13 +43,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener, OnMarke
       if (isGranted) {
         checkLocationPermission()
       } else {
-        //TODO: show toast
+        Toast.makeText(context,"Location permission not granted", Toast.LENGTH_SHORT).show()
       }
     }
-  private val cafeIcon: BitmapDescriptor by lazy {
-    val color = ContextCompat.getColor(requireContext(), R.color.purple_500)
-    BitmapHelper.vectorToBitmap(requireContext(), R.drawable.ic_restaurant, color)
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -88,9 +88,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener, OnMarke
               mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_invisible))
               filterMarker = mMap.addMarker(
                 MarkerOptions()
-                  .title(it.name)
+//                  .title(it.name)
                   .position(LatLng(it.geometry.location.lat,it.geometry.location.lng))
-                  .icon(cafeIcon)
+                  .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
                   .snippet(it.placeId)
               )
             }
@@ -106,20 +106,19 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener, OnMarke
     binding.bottomNavigation.setOnItemSelectedListener { item->
       when(item.itemId) {
         R.id.cafe -> {
-          Log.d("MapsFragment","cafe clicked")
-          viewModel.getNearbyPlacesByType(
-            lastLocation.latitude.toString()+","+lastLocation.longitude.toString(),
-            "restaurant"
-          )
+          onSelectItemAction("restaurant")
           true
         }
         R.id.atm -> {
+          onSelectItemAction("atm")
           true
         }
         R.id.hospital -> {
+          onSelectItemAction("hospital")
           true
         }
         R.id.school -> {
+          onSelectItemAction("school")
           true
         }
         else -> false
@@ -129,26 +128,19 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener, OnMarke
     binding.bottomNavigation.setOnItemReselectedListener { item ->
       when(item.itemId) {
         R.id.cafe -> {
-//          filterMarker?.remove()
-          mMap.clear()
-          placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
-          mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_visible))
-          binding.bottomNavigation.menu.findItem(R.id.extra).isChecked = true
-          Log.d("MapsFragment","cafe reclicked")
+          onReselectedItemAction()
         }
         R.id.atm -> {
-
-          // Respond to navigation item 2 reselection
+          onReselectedItemAction()
         }
         R.id.hospital -> {
-          // Respond to navigation item 2 reselection
+          onReselectedItemAction()
         }
         R.id.school -> {
-          // Respond to navigation item 2 reselection
+          onReselectedItemAction()
         }
         else -> { }
       }
-
     }
   }
 
@@ -194,14 +186,27 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener, OnMarke
     mMap.addMarker(markerOptions)
   }
 
+  private fun onSelectItemAction(type: String){
+    mMap.clear()
+    placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+    viewModel.getNearbyPlacesByType(
+      lastLocation.latitude.toString()+","+lastLocation.longitude.toString(),
+      type
+    )
+    Toast.makeText(context,"Showing nearby $type",Toast.LENGTH_LONG).show()
+  }
+
+  private fun onReselectedItemAction(){
+    mMap.clear()
+    placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_visible))
+    binding.bottomNavigation.menu.findItem(R.id.extra).isChecked = true
+    Log.d("MapsFragment","cafe reclicked")
+  }
+
   override fun onPoiClick(poi: PointOfInterest) {
     viewModel.getPlaceDetails(poi.placeId)
     PlaceBottomSheet().show(childFragmentManager,"PlaceBottomSheet")
-//    Toast.makeText(requireContext(), """Clicked: ${poi.name}
-//            Place ID:${poi.placeId}
-//            Latitude:${poi.latLng.latitude} Longitude:${poi.latLng.longitude}""",
-//      Toast.LENGTH_SHORT
-//    ).show()
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
