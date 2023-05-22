@@ -2,7 +2,7 @@
   <string name="app_name">NearMePlaces</string>
   <!-- TODO: Remove or change this placeholder text -->
   <string name="hello_blank_fragment">Hello blank fragment</string>
-  <string name="navigate">   Navigate</string>
+  <string name="navigate">Get direction</string>
   <string name="name">Name:</string>
   <string name="address">Address:</string>
   <string name="rating">Rating:</string>

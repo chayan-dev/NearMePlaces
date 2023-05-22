@@ -185,7 +185,7 @@ class MapsFragment : Fragment(),
       "${lastLocation.latitude},${lastLocation.longitude}",
       type
     )
-    Toast.makeText(context, "Showing nearby $type", Toast.LENGTH_LONG).show()
+    Toast.makeText(context, "Showing nearby $type", Toast.LENGTH_SHORT).show()
   }
 
   private fun onReselectedItemAction() {
@@ -215,7 +215,7 @@ class MapsFragment : Fragment(),
   override fun onMarkerClick(marker: Marker): Boolean {
     viewModel.getPlaceDetails(marker.snippet.toString())
     PlaceBottomSheet().show(childFragmentManager, "PlaceBottomSheet")
-    return false
+    return true
   }
 
 }
