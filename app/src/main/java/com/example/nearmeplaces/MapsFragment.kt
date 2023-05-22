@@ -29,8 +29,7 @@ import com.google.android.gms.maps.model.*
 class MapsFragment : Fragment(),
   OnMapReadyCallback,
   OnPoiClickListener,
-  OnMarkerClickListener
-{
+  OnMarkerClickListener {
 
   private lateinit var binding: FragmentMapsBinding
   private val viewModel: MapsViewModel by activityViewModels()
@@ -43,7 +42,7 @@ class MapsFragment : Fragment(),
       if (isGranted) {
         checkLocationPermission()
       } else {
-        Toast.makeText(context,"Location permission not granted", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Location permission not granted", Toast.LENGTH_SHORT).show()
       }
     }
 
@@ -51,8 +50,7 @@ class MapsFragment : Fragment(),
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    // Inflate the layout for this fragment
-    binding = FragmentMapsBinding.inflate(inflater,container,false)
+    binding = FragmentMapsBinding.inflate(inflater, container, false)
     return binding.root
   }
 
@@ -65,46 +63,38 @@ class MapsFragment : Fragment(),
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-    viewModel.placeDetails.observe(viewLifecycleOwner) { response ->
-      when(response){
-        is Resource.Success -> {
-          response.data?.let {
-            Log.d("placeDetails", response.data.result.name.toString())
-          }
-        }
-        is Resource.Loading -> {
-
-        }
-        else -> {}
-      }
-    }
-
     viewModel.nearbyPlacesListDetails.observe(viewLifecycleOwner) { response ->
-      when(response){
+      when (response) {
         is Resource.Success -> {
+          hideProgressBar()
           response.data?.let {
-            it.results.forEach{
-              Log.d("nearbyPLace:", it.name)
-              mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_invisible))
+            it.results.forEach { result ->
+              mMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                  requireContext(),
+                  R.raw.style_invisible
+                )
+              )
               filterMarker = mMap.addMarker(
                 MarkerOptions()
-//                  .title(it.name)
-                  .position(LatLng(it.geometry.location.lat,it.geometry.location.lng))
+                  .position(LatLng(result.geometry.location.lat, result.geometry.location.lng))
                   .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
-                  .snippet(it.placeId)
+                  .snippet(result.placeId)
               )
             }
           }
         }
         is Resource.Loading -> {
-
+          showProgressBar()
         }
-        else -> {}
+        else -> {
+          hideProgressBar()
+        }
       }
     }
 
-    binding.bottomNavigation.setOnItemSelectedListener { item->
-      when(item.itemId) {
+    binding.bottomNavigation.setOnItemSelectedListener { item ->
+      when (item.itemId) {
         R.id.cafe -> {
           onSelectItemAction("restaurant")
           true
@@ -126,7 +116,7 @@ class MapsFragment : Fragment(),
     }
 
     binding.bottomNavigation.setOnItemReselectedListener { item ->
-      when(item.itemId) {
+      when (item.itemId) {
         R.id.cafe -> {
           onReselectedItemAction()
         }
@@ -139,14 +129,13 @@ class MapsFragment : Fragment(),
         R.id.school -> {
           onReselectedItemAction()
         }
-        else -> { }
+        else -> {}
       }
     }
   }
 
   override fun onMapReady(googleMap: GoogleMap) {
     mMap = googleMap
-//    mMap.uiSettings.isZoomControlsEnabled = true
     checkLocationPermission()
     mMap.setOnPoiClickListener(this)
     mMap.setOnMarkerClickListener(this)
@@ -162,8 +151,6 @@ class MapsFragment : Fragment(),
       requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
       return
     }
-    Log.d("MapsFragment","having loc permission")
-
     getCurrentLocation()
   }
 
@@ -186,34 +173,40 @@ class MapsFragment : Fragment(),
     mMap.addMarker(markerOptions)
   }
 
-  private fun onSelectItemAction(type: String){
+  private fun onSelectItemAction(type: String) {
     mMap.clear()
     placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
     viewModel.getNearbyPlacesByType(
-      lastLocation.latitude.toString()+","+lastLocation.longitude.toString(),
+      "${lastLocation.latitude},${lastLocation.longitude}",
       type
     )
-    Toast.makeText(context,"Showing nearby $type",Toast.LENGTH_LONG).show()
+    Toast.makeText(context, "Showing nearby $type", Toast.LENGTH_LONG).show()
   }
 
-  private fun onReselectedItemAction(){
+  private fun onReselectedItemAction() {
     mMap.clear()
     placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
-    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_visible))
+    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.style_visible))
     binding.bottomNavigation.menu.findItem(R.id.extra).isChecked = true
-    Log.d("MapsFragment","cafe reclicked")
+  }
+
+  private fun hideProgressBar() {
+    binding.loader.root.visibility = View.INVISIBLE
+  }
+
+  private fun showProgressBar() {
+    binding.loader.root.visibility = View.VISIBLE
   }
 
   override fun onPoiClick(poi: PointOfInterest) {
     viewModel.getPlaceDetails(poi.placeId)
-    PlaceBottomSheet().show(childFragmentManager,"PlaceBottomSheet")
+    PlaceBottomSheet().show(childFragmentManager, "PlaceBottomSheet")
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
-    val uu= marker.snippet
-    Log.d("markerListener",uu.toString())
+    val uu = marker.snippet
     viewModel.getPlaceDetails(marker.snippet.toString())
-    PlaceBottomSheet().show(childFragmentManager,"PlaceBottomSheet")
+    PlaceBottomSheet().show(childFragmentManager, "PlaceBottomSheet")
     return false
   }
 

@@ -13,7 +13,7 @@ import com.example.nearmeplaces.utils.Resource
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class PlaceBottomSheet: BottomSheetDialogFragment() {
+class PlaceBottomSheet : BottomSheetDialogFragment() {
 
   lateinit var binding: BottomSheetLayoutBinding
   private val viewModel: MapsViewModel by activityViewModels()
@@ -24,42 +24,51 @@ class PlaceBottomSheet: BottomSheetDialogFragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    binding = BottomSheetLayoutBinding.inflate(inflater,container,false)
+    binding = BottomSheetLayoutBinding.inflate(inflater, container, false)
     return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    viewModel.placeDetails.observe(this){ response ->
-      when(response){
+    viewModel.placeDetails.observe(this) { response ->
+      when (response) {
         is Resource.Success -> {
-          response.data?.let { place->
-            Log.d("placeDetails", response.data.result.name.toString())
+          hideProgressBar()
+          response.data?.let { place ->
             binding.name.text = place.result.name.toString()
             binding.address.text = place.result.formattedAddress
             binding.rating.text = place.result.rating.toString()
-            latLng = place.result.geometry?.location?.let { LatLng(it.lat,it.lng) }
+            latLng = place.result.geometry.location.let { LatLng(it.lat, it.lng) }
           }
         }
         is Resource.Loading -> {
-
+          showProgressBar()
         }
-        else -> {}
+        else -> {
+          hideProgressBar()
+        }
       }
     }
 
     binding.closeIv.setOnClickListener { dismiss() }
 
     binding.navBtn.setOnClickListener { sendNavigationToGoogleMaps() }
-
   }
 
-  private fun sendNavigationToGoogleMaps(){
+  private fun sendNavigationToGoogleMaps() {
     val gmmIntentUri =
       Uri.parse("google.navigation:q=${latLng?.latitude},${latLng?.longitude}")
     val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
     mapIntent.setPackage("com.google.android.apps.maps")
     startActivity(mapIntent)
+  }
+
+  private fun hideProgressBar() {
+    binding.loader.root.visibility = View.INVISIBLE
+  }
+
+  private fun showProgressBar() {
+    binding.loader.root.visibility = View.VISIBLE
   }
 }
