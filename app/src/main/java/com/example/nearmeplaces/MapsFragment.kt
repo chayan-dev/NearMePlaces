@@ -10,28 +10,26 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.example.nearmeplaces.databinding.FragmentMapsBinding
-import com.example.nearmeplaces.repository.PlacesRepository
 import com.example.nearmeplaces.utils.BitmapHelper
 import com.example.nearmeplaces.utils.Resource
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.GoogleMap.OnPoiClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
-class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
+class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener, OnMarkerClickListener {
 
   private lateinit var binding: FragmentMapsBinding
-  private lateinit var viewModel: MapsViewModel
+  private val viewModel: MapsViewModel by activityViewModels()
   private lateinit var mMap: GoogleMap
   private lateinit var lastLocation: Location
   private var filterMarker: Marker? = null
@@ -60,11 +58,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    val placesRepository = PlacesRepository()
-    viewModel =
-      ViewModelProvider(this, MapsViewModelFactory(placesRepository))
-        .get(MapsViewModel::class.java)
 
     val mapFragment =
       childFragmentManager.findFragmentById(R.id.google_map) as SupportMapFragment
@@ -98,6 +91,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
                   .title(it.name)
                   .position(LatLng(it.geometry.location.lat,it.geometry.location.lng))
                   .icon(cafeIcon)
+                  .snippet(it.placeId)
               )
             }
           }
@@ -116,25 +110,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
           viewModel.getNearbyPlacesByType(
             lastLocation.latitude.toString()+","+lastLocation.longitude.toString(),
             "restaurant"
-            )
+          )
           true
-          // Respond to navigation item 1 reselection
         }
-//        R.id.park -> {
-//          true
-//          // Respond to navigation item 2 reselection
-//        }
         R.id.atm -> {
           true
-          // Respond to navigation item 2 reselection
         }
         R.id.hospital -> {
           true
-          // Respond to navigation item 2 reselection
         }
         R.id.school -> {
           true
-          // Respond to navigation item 2 reselection
         }
         else -> false
       }
@@ -149,7 +135,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
           mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.style_visible))
           binding.bottomNavigation.menu.findItem(R.id.extra).isChecked = true
           Log.d("MapsFragment","cafe reclicked")
-          // Respond to navigation item 1 reselection
         }
         R.id.atm -> {
 
@@ -172,6 +157,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
 //    mMap.uiSettings.isZoomControlsEnabled = true
     checkLocationPermission()
     mMap.setOnPoiClickListener(this)
+    mMap.setOnMarkerClickListener(this)
   }
 
   private fun checkLocationPermission() {
@@ -210,11 +196,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback, OnPoiClickListener {
 
   override fun onPoiClick(poi: PointOfInterest) {
     viewModel.getPlaceDetails(poi.placeId)
-    Toast.makeText(requireContext(), """Clicked: ${poi.name}
-            Place ID:${poi.placeId}
-            Latitude:${poi.latLng.latitude} Longitude:${poi.latLng.longitude}""",
-      Toast.LENGTH_SHORT
-    ).show()
+    PlaceBottomSheet().show(childFragmentManager,"PlaceBottomSheet")
+//    Toast.makeText(requireContext(), """Clicked: ${poi.name}
+//            Place ID:${poi.placeId}
+//            Latitude:${poi.latLng.latitude} Longitude:${poi.latLng.longitude}""",
+//      Toast.LENGTH_SHORT
+//    ).show()
+  }
+
+  override fun onMarkerClick(marker: Marker): Boolean {
+    val uu= marker.snippet
+    Log.d("markerListener",uu.toString())
+    viewModel.getPlaceDetails(marker.snippet.toString())
+    PlaceBottomSheet().show(childFragmentManager,"PlaceBottomSheet")
+    return false
   }
 
 }
