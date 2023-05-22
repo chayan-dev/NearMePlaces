@@ -7,7 +7,7 @@
 - Build and run the app.
 - Enable location from settings/notification panel in the device.
 
-##Walkthrough video:  [VIDEO](https://drive.google.com/file/d/1chytYZspP5VlJgVXqdC_mlllw19cZGHl/view?usp=share_link)
+## Walkthrough video:  [VIDEO](https://drive.google.com/file/d/1chytYZspP5VlJgVXqdC_mlllw19cZGHl/view?usp=share_link)
 
 ## Features:
 - Locate your location in the map.
