@@ -19,3 +19,5 @@
 ## Design:
 - MVVM architechture with retrofit and coroutines
 - Google Maps SDK and Places API
+
+## APK:  [Download](https://drive.google.com/file/d/1KhKsGZ-gVUmkbLVK-bgTpFfQoNLZCXRD/view?usp=share_link)
