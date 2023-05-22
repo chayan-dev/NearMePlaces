@@ -1,4 +1,4 @@
-package com.example.nearmeplaces
+package com.example.nearmeplaces.ui.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

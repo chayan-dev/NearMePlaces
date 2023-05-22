@@ -6,4 +6,8 @@
   <string name="name">Name:</string>
   <string name="address">Address:</string>
   <string name="rating">Rating:</string>
+  <string name="restaurant">restaurant</string>
+  <string name="atm">atm</string>
+  <string name="hospital">hospital</string>
+  <string name="school">school</string>
 </resources>

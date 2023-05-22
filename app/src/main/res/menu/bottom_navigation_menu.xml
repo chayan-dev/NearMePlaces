@@ -10,29 +10,23 @@
     android:id="@+id/cafe"
     android:enabled="true"
     android:icon="@drawable/ic_restaurant"
-    android:title="restaurant"/>
-
-<!--  <item-->
-<!--    android:id="@+id/park"-->
-<!--    android:enabled="true"-->
-<!--    android:icon="@drawable/ic_sports"-->
-<!--    android:title="park"/>-->
+    android:title="@string/restaurant"/>
 
   <item
     android:id="@+id/atm"
     android:enabled="true"
     android:icon="@drawable/ic_local_atm"
-    android:title="atm"/>
+    android:title="@string/atm"/>
 
   <item
     android:id="@+id/hospital"
     android:enabled="true"
     android:icon="@drawable/ic_hospital"
-    android:title="hospital"/>
+    android:title="@string/hospital"/>
 
   <item
     android:id="@+id/school"
     android:enabled="true"
     android:icon="@drawable/ic_school"
-    android:title="school"/>
+    android:title="@string/school"/>
 </menu>

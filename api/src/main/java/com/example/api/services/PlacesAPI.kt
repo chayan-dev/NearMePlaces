@@ -22,7 +22,7 @@ interface PlacesAPI {
     @Query("location")
     location: String,
     @Query("radius")
-    radius: Int = 5000,
+    radius: Int = 5000,  //in meters
     @Query("type")
     type: String,
     @Query("key")

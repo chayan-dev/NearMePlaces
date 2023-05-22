@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import com.example.nearmeplaces.repository.PlacesRepository
+import com.example.nearmeplaces.ui.viewmodels.MapsViewModel
+import com.example.nearmeplaces.ui.viewmodels.MapsViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 

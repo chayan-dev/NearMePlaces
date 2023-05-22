@@ -1,14 +1,15 @@
-package com.example.nearmeplaces
+package com.example.nearmeplaces.ui.fragments
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import com.example.nearmeplaces.databinding.BottomSheetLayoutBinding
+import com.example.nearmeplaces.ui.viewmodels.MapsViewModel
 import com.example.nearmeplaces.utils.Resource
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -31,6 +32,7 @@ class PlaceBottomSheet : BottomSheetDialogFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    //observing point of interest details response from api
     viewModel.placeDetails.observe(this) { response ->
       when (response) {
         is Resource.Success -> {
@@ -47,6 +49,7 @@ class PlaceBottomSheet : BottomSheetDialogFragment() {
         }
         else -> {
           hideProgressBar()
+          Toast.makeText(context,"api error occurred", Toast.LENGTH_SHORT).show()
         }
       }
     }
@@ -56,6 +59,7 @@ class PlaceBottomSheet : BottomSheetDialogFragment() {
     binding.navBtn.setOnClickListener { sendNavigationToGoogleMaps() }
   }
 
+  //intent to google maps app in the device for directions
   private fun sendNavigationToGoogleMaps() {
     val gmmIntentUri =
       Uri.parse("google.navigation:q=${latLng?.latitude},${latLng?.longitude}")

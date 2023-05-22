@@ -1,11 +1,10 @@
-package com.example.nearmeplaces
+package com.example.nearmeplaces.ui.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import com.example.nearmeplaces.R
 import com.example.nearmeplaces.databinding.FragmentMapsBinding
+import com.example.nearmeplaces.ui.viewmodels.MapsViewModel
 import com.example.nearmeplaces.utils.Resource
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -63,6 +64,7 @@ class MapsFragment : Fragment(),
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
+    //observing nearby place response from api
     viewModel.nearbyPlacesListDetails.observe(viewLifecycleOwner) { response ->
       when (response) {
         is Resource.Success -> {
@@ -89,10 +91,12 @@ class MapsFragment : Fragment(),
         }
         else -> {
           hideProgressBar()
+          Toast.makeText(context,"api error occurred", Toast.LENGTH_SHORT).show()
         }
       }
     }
 
+    //bottom-nav bar item click actions
     binding.bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
         R.id.cafe -> {
@@ -115,6 +119,7 @@ class MapsFragment : Fragment(),
       }
     }
 
+    //clicking already selected item in bottom nav bar
     binding.bottomNavigation.setOnItemReselectedListener { item ->
       when (item.itemId) {
         R.id.cafe -> {
@@ -198,13 +203,16 @@ class MapsFragment : Fragment(),
     binding.loader.root.visibility = View.VISIBLE
   }
 
+  // fetch point of interest details on clicking marker and show in bottom sheet
+  // when map is in default state i.e. when not filtered
   override fun onPoiClick(poi: PointOfInterest) {
     viewModel.getPlaceDetails(poi.placeId)
     PlaceBottomSheet().show(childFragmentManager, "PlaceBottomSheet")
   }
 
+  // fetch point of interest details on clicking marker and show in bottom sheet
+  // when map is in filtered state
   override fun onMarkerClick(marker: Marker): Boolean {
-    val uu = marker.snippet
     viewModel.getPlaceDetails(marker.snippet.toString())
     PlaceBottomSheet().show(childFragmentManager, "PlaceBottomSheet")
     return false

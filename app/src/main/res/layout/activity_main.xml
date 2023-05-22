@@ -8,7 +8,7 @@
 
   <androidx.fragment.app.FragmentContainerView
     android:id="@+id/mapFragment"
-    android:name="com.example.nearmeplaces.MapsFragment"
+    android:name="com.example.nearmeplaces.ui.fragments.MapsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_constraintBottom_toBottomOf="parent"
